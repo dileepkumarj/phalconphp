@@ -39,9 +39,8 @@ $di->setShared('url', function () {
 /**
  * Setting up the view component
  */
-$config = $this->getConfig();
 $di->setShared('view', function () {
-    
+    $config = $this->getConfig();
 
     $view = new View();
     $view->setDI($this);
