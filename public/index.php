@@ -1,33 +1,47 @@
 <?php
+use Phalcon\Di\FactoryDefault;
 
 error_reporting(E_ALL);
 
+define('BASE_PATH', dirname(__DIR__));
+define('APP_PATH', BASE_PATH . '/app');
+
 try {
 
-	/**
-	 * Read the configuration
-	 */
-	$config = require __DIR__ . "/../app/config/config.php";
+    /**
+     * The FactoryDefault Dependency Injector automatically registers
+     * the services that provide a full stack framework.
+     */
+    $di = new FactoryDefault();
 
-	/**
-	 * Include loader
-	 */
-	require __DIR__ . '/../app/config/loader.php';
+    /**
+     * Handle routes
+     */
+    include APP_PATH . '/config/router.php';
 
-	/**
-	 * Include services
-	 */
-	require __DIR__ . '/../app/config/services.php';
+    /**
+     * Read services
+     */
+    include APP_PATH . '/config/services.php';
 
-	/**
-	 * Handle the request
-	 */
-	$application = new \Phalcon\Mvc\Application();
-	$application->setDI($di);
-	echo $application->handle()->getContent();
+    /**
+     * Get config service for use in inline setup below
+     */
+    $config = $di->getConfig();
 
-} catch (Phalcon\Exception $e) {
-	echo $e->getMessage();
-} catch (PDOException $e){
-	echo $e->getMessage();
+    /**
+     * Include Autoloader
+     */
+    include APP_PATH . '/config/loader.php';
+
+    /**
+     * Handle the request
+     */
+    $application = new \Phalcon\Mvc\Application($di);
+
+    echo $application->handle()->getContent();
+
+} catch (\Exception $e) {
+    echo $e->getMessage() . '<br>';
+    echo '<pre>' . $e->getTraceAsString() . '</pre>';
 }
